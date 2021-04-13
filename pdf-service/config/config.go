@@ -8,7 +8,7 @@ import (
 type Config struct {
 	SubId       string `envconfig:"SUBSCRIPTION_ID"`
 	ProjectId   string `envconfig:"PROJECT_ID"`
-	Credentials string `envconfig:"GOOGLE_APPLICATION_CREDENTIALS"`
+	Credentials string `envconfig:"GOOGLE_CREDENTIALS_JSON"`
 }
 
 func ReadConfig() Config {

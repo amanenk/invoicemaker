@@ -2,36 +2,17 @@ package main
 
 import (
 	"cloud.google.com/go/pubsub"
+	"encoding/json"
 	"fmt"
 	"github.com/fdistorted/pdfGenerator/config"
+	"github.com/fdistorted/pdfGenerator/db"
+	"github.com/fdistorted/pdfGenerator/models"
 	u "github.com/fdistorted/pdfGenerator/pdf"
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
 	"log"
 	"time"
 )
-
-type InvoiceItem struct {
-	Title    string
-	Quantity float32
-	Rate     float32
-	Amount   float32
-}
-
-type InvoiceData struct {
-	Logo          *string
-	InvoiceId     string
-	InvoiceFrom   string
-	BillTo        string
-	Date          time.Time
-	DateFormatted string
-	Currency      string
-	Items         []InvoiceItem
-	Total         float32
-	Notes         *string
-	Terms         *string
-	Signature     *string
-}
 
 func createPdf() {
 	start := time.Now()
@@ -43,7 +24,7 @@ func createPdf() {
 	//path for download pdf
 	outputPath := "storage/testpdf.pdf"
 
-	invoiceItems := []InvoiceItem{
+	invoiceItems := []models.InvoiceItem{
 		{Title: "hello", Quantity: 10, Rate: 12.5},
 		{Title: "hello1", Quantity: 2.5, Rate: 22.5},
 	}
@@ -61,12 +42,11 @@ func createPdf() {
 	signature := "https://p.kindpng.com/picc/s/26-264820_signatures-samples-png-ron-paul-signature-transparent-png.png"
 
 	//html template data
-	templateData := InvoiceData{
+	templateData := models.InvoiceData{
 		Logo:        &logo,
 		InvoiceId:   "test123",
 		InvoiceFrom: "Sparksuite, Inc. 12345 Sunny Road Sunnyville, CA 12345",
 		BillTo:      "Sparksuite, Inc. 12345 Sunny Road Sunnyville, CA 12345",
-		Date:        time.Now(),
 
 		Currency: "$",
 		Items:    invoiceItems,
@@ -76,7 +56,7 @@ func createPdf() {
 		Signature: &signature,
 	}
 
-	templateData.DateFormatted = templateData.Date.Format("January 2, 2006")
+	//templateData.DateFormatted = templateData.Date.Format("January 2, 2006")
 
 	if err := r.ParseTemplate(templatePath, templateData); err == nil {
 		ok, _ := r.GeneratePDF(outputPath)
@@ -92,20 +72,39 @@ func main() {
 	log.Printf("Config:\n %+v", c)
 
 	ctx := context.Background()
-	client, err := pubsub.NewClient(ctx, c.ProjectId, option.WithCredentialsJSON([]byte(c.Credentials)))
+
+	jsonBytes := []byte(c.Credentials)
+	//init pubsub
+	client, err := pubsub.NewClient(ctx, c.ProjectId, option.WithCredentialsJSON(jsonBytes))
 	if err != nil {
 		log.Fatalf("pubsub.NewClient: %v", err)
 	}
 
+	////init database
+	dbClient := db.FirestoreNew(jsonBytes)
+
 	sub := client.Subscription(c.SubId)
+	log.Println("listening to subscription...")
+
 	err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		createPdf()
+		//createPdf()
+
 		fmt.Printf("Got message: %q\n", string(msg.Data))
+
+		var msgData models.PubSubPayload
+		err := json.Unmarshal([]byte(msg.Data), &msgData)
+		test, err := dbClient.GetInvoice(msgData.InvoiceId)
+		if err != nil {
+			_ = fmt.Errorf("failed to get invoice data %+v\n", err)
+		}
+		log.Printf("got invoice %+v\n", test)
 		msg.Ack()
 	})
 
 	if err != nil {
 		log.Fatalf("Receive: %v", err)
 	}
+
+	log.Println("exiting...")
 
 }
