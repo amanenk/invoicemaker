@@ -2,6 +2,8 @@ import * as firebase from "firebase/app";
 
 import "firebase/auth";
 import "firebase/firestore";
+import 'firebase/functions';
+
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -46,6 +48,4 @@ export const logOut = () => {
 }
 
 export const firestore = firebase.firestore();
-
-
-export const functions = firebase.functions();
+export const functions = firebase.functions()

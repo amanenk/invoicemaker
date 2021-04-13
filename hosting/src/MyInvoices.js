@@ -16,13 +16,6 @@ export default function MyInvoices() {
         return <Redirect to={redirect} />;
     }
 
-    if (!user) {
-        return (
-            <div className="mt-2">
-                Not Authorized
-            </div>
-        )
-    }
 
     return (
         <div className="mt-2">

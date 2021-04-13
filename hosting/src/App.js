@@ -10,7 +10,7 @@ import { UserContext } from "./providers/UserProvider";
 import Spinner from 'react-bootstrap/Spinner';
 
 export default function App() {
-  const {user, authLoaded } = useContext(UserContext);
+  const { user, authLoaded } = useContext(UserContext);
   if (!authLoaded) {
     console.log("show loading")
     return (
@@ -33,7 +33,7 @@ export default function App() {
             <MyInvoices />
           </Route>
           <Route path="/invoice/:key">
-            <InvoiceForm userId={user.uid} />
+            <InvoiceForm userId={user ? user.uid : null} />
           </Route>
         </Switch>
       </div>

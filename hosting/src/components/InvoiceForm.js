@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { Button, Container, Form, Row, Col } from 'react-bootstrap';
 import InvoicesService from '../services/InvoicesService';
+import NumericInput from 'react-numeric-input';
 
 import { LinkContainer } from 'react-router-bootstrap'
 
@@ -54,9 +55,15 @@ class InvoiceEdit extends Component {
         this.setState({ invoice });
     };
 
-    handleItemChange = (e, key) => {
-        const value = e.target.value;
-        const name = e.target.name;
+    handleItemChange = (e, key, isNumeric) => {
+        if (isNumeric) {
+            var value = e.valueAsNumber;
+            var name = e.input.name;
+        }
+        else {
+            var value = e.target.value;
+            var name = e.target.name;
+        }
 
         console.log(name, value, key)
         var { invoice } = this.state;
@@ -108,10 +115,10 @@ class InvoiceEdit extends Component {
                         <Form.Control name="title" onChange={(e) => this.handleItemChange(e, i.id)} type="text" placeholder="Title" value={i.title || ''} />
                     </Col>
                     <Col>
-                        <Form.Control name="quantity" onChange={(e) => this.handleItemChange(e, i.id)} type="text" placeholder="Quantity" value={i.quantity || ''} />
+                        <NumericInput className="form-control" name="quantity" onChange={(valueAsNumber, valueAsString, input) => this.handleItemChange({ valueAsNumber, valueAsString, input }, i.id, true)} type="text" placeholder="Quantity" value={i.quantity || ''} />
                     </Col>
                     <Col>
-                        <Form.Control name="rate" onChange={(e) => this.handleItemChange(e, i.id)} type="text" placeholder="Rate" value={i.rate || ''} />
+                        <NumericInput className="form-control" name="rate" onChange={(valueAsNumber, valueAsString, input) => this.handleItemChange({ valueAsNumber, valueAsString, input }, i.id, true)} type="text" placeholder="Rate" value={i.rate || ''} />
                     </Col>
                     <Col>
                         <Form.Label  >{invoice.currency}{i.rate * i.quantity}</Form.Label>
