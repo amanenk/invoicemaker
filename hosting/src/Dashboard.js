@@ -4,7 +4,7 @@ import { UserContext } from "./providers/UserProvider";
 import { Redirect } from "react-router-dom";
 import { logOut } from "./services/firebase";
 export default function Dashboard() {
-  const user = useContext(UserContext);
+  const {user} = useContext(UserContext);
   const [redirect, setredirect] = useState(null);
 
   useEffect(() => {

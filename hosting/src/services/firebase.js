@@ -36,6 +36,7 @@ export const signInWithGoogle = () => {
     })
   })
 }
+
 export const logOut = () => {
   auth.signOut().then(()=> {
     console.log('logged out')
@@ -43,3 +44,5 @@ export const logOut = () => {
     console.log(error.message)
   })
 }
+
+export const firestore = firebase.firestore();

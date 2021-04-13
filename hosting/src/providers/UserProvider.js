@@ -1,8 +1,10 @@
 import React, { useState, useEffect, createContext } from "react";
 import { auth } from "../services/firebase";
-export const UserContext = createContext({ user: null });
+export const UserContext = createContext({ user: null, authLoaded: false });
+
 export default (props) => {
   const [user, setuser] = useState(null);
+  const [authLoaded, setauthLoaded] = useState(null);
 
   useEffect(() => {
     auth.onAuthStateChanged(async (user) => {
@@ -15,10 +17,11 @@ export default (props) => {
         });
       }
       console.log("login onAuthStateChanged");
+      setauthLoaded(true);
     });
   }, []);
 
   return (
-    <UserContext.Provider value={user}>{props.children}</UserContext.Provider>
+    <UserContext.Provider value={{user, authLoaded}}>{props.children}</UserContext.Provider>
   );
 };

@@ -1,10 +1,9 @@
 import React, { useEffect, useContext, useState } from "react";
 import { UserContext } from "./providers/UserProvider";
+import InvoicesList from "./components/InvoicesList"
 import { Redirect } from "react-router-dom";
-
-import Button from 'react-bootstrap/Button';
 export default function MyInvoices() {
-    const user = useContext(UserContext);
+    const {user} = useContext(UserContext);
     const [redirect, setredirect] = useState(null);
 
     useEffect(() => {
@@ -17,10 +16,19 @@ export default function MyInvoices() {
         return <Redirect to={redirect} />;
     }
 
+    if (!user) {
+        return (
+            <div className="mt-2">
+                Not Authorized
+            </div>
+        )
+    }
+
+    console.log("my invoices user", user);
+
     return (
-        <div>
-            <p>There are no invoices yet press on the button below to create one</p>
-            <Button className="ml-2" variant="secondary" onClick={() => { window.location.reload(); }}>Create Invoice</Button>
+        <div className="mt-2">
+            <InvoicesList user={user.uid} />
         </div>
     );
 }

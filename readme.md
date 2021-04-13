@@ -7,3 +7,4 @@ TODO:
     -  build invoice creation page  
     -  build my invoices page  
     -  store pdf from invoice creating service to storage  
+    -  use Cloud Firestore  

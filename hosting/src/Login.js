@@ -4,7 +4,7 @@ import { signInWithGoogle } from './services/firebase';
 import { UserContext } from './providers/UserProvider';
 import { Redirect } from 'react-router-dom';
 export default function Login() {
-  const user = useContext(UserContext)
+  const {user} = useContext(UserContext)
   const [redirect, setredirect] = useState(null)
 
   useEffect(() => {
