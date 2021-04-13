@@ -46,3 +46,6 @@ export const logOut = () => {
 }
 
 export const firestore = firebase.firestore();
+
+
+export const functions = firebase.functions();

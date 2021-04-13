@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Button, ButtonGroup, Container, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import InvoicesService from '../services/InvoicesService';
+import { functions } from '../services/firebase';
 
 import { LinkContainer } from 'react-router-bootstrap'
 
@@ -65,7 +66,12 @@ export default class InvoicesList extends Component {
                         <LinkContainer to={`/invoice/${invoice.key}`}>
                             <Button size="sm" variant="primary" tag={Link} to={"/invoices/" + invoice.key}>Edit</Button>
                         </LinkContainer>
-                        <Button size="sm" variant="success">Download</Button>
+                        <Button size="sm" variant="success" onClick={() => {
+                            const generatePdf = functions.httpsCallable('GeneratePdf')
+                            generatePdf(invoice.key).then(result => {
+                                console.info(`got response ${JSON.stringify(result)}`)
+                            })
+                        }}>Download</Button>
                         <Button size="sm" variant="danger" onClick={() => this.remove(invoice.key)}>Delete</Button>
                     </ButtonGroup>
                 </td>
