@@ -3,6 +3,9 @@ import React, { Component } from 'react';
 import { Button, ButtonGroup, Container, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import InvoicesService from '../services/InvoicesService';
+
+import { LinkContainer } from 'react-router-bootstrap'
+
 export default class InvoicesList extends Component {
     constructor(props) {
         super(props);
@@ -59,8 +62,10 @@ export default class InvoicesList extends Component {
                 <td>{invoice.currency}{invoice.amount}</td>
                 <td>
                     <ButtonGroup>
-                        <Button size="sm" variant="primary" tag={Link} to={"/customers/" + invoice.key}>Edit</Button>
-                        <Button size="sm" variant="success" tag={Link} to={"/customers/" + invoice.key}>Download</Button>
+                        <LinkContainer to={`/invoice/${invoice.key}`}>
+                            <Button size="sm" variant="primary" tag={Link} to={"/invoices/" + invoice.key}>Edit</Button>
+                        </LinkContainer>
+                        <Button size="sm" variant="success">Download</Button>
                         <Button size="sm" variant="danger" onClick={() => this.remove(invoice.key)}>Delete</Button>
                     </ButtonGroup>
                 </td>
@@ -71,7 +76,9 @@ export default class InvoicesList extends Component {
             <div>
                 <Container fluid>
                     <div className="float-right">
-                        <Button color="success" tag={Link} to="/customers/new">Add Invoice</Button>
+                        <LinkContainer to="/invoice/new">
+                            <Button color="success">Add Invoice</Button>
+                        </LinkContainer>
                     </div>
                     <h3>Invoices</h3>
                     <Table className="mt-4">

@@ -4,11 +4,13 @@ import "./App.css"
 import Navbar from "./Navbar"
 import Landing from "./Landing"
 import MyInvoices from "./MyInvoices"
+
+import InvoiceForm from "./components/InvoiceForm"
 import { UserContext } from "./providers/UserProvider";
 import Spinner from 'react-bootstrap/Spinner';
 
 export default function App() {
-  const { authLoaded } = useContext(UserContext);
+  const {user, authLoaded } = useContext(UserContext);
   if (!authLoaded) {
     console.log("show loading")
     return (
@@ -29,6 +31,9 @@ export default function App() {
           </Route>
           <Route path="/my-invoices">
             <MyInvoices />
+          </Route>
+          <Route path="/invoice/:key">
+            <InvoiceForm userId={user.uid} />
           </Route>
         </Switch>
       </div>

@@ -15,7 +15,6 @@ export default () => {
     <Navbar.Brand>Invoice Maker</Navbar.Brand>
   </LinkContainer>
 
-  console.log("navbar user", user);
   if (user) {
     return (
       <Navbar bg="dark" variant="dark" expand="lg">
@@ -24,7 +23,7 @@ export default () => {
           <LinkContainer to="/my-invoices">
             <Nav.Link>My Invoices</Nav.Link>
           </LinkContainer>
-          <LinkContainer to="/invoice?id=new">
+          <LinkContainer to="/invoice/new">
             <Nav.Link>Create Invoice</Nav.Link>
           </LinkContainer>
         </Nav>

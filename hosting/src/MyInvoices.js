@@ -24,8 +24,6 @@ export default function MyInvoices() {
         )
     }
 
-    console.log("my invoices user", user);
-
     return (
         <div className="mt-2">
             <InvoicesList user={user.uid} />
