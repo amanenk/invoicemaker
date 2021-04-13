@@ -66,11 +66,14 @@ export default class InvoicesList extends Component {
                         <LinkContainer to={`/invoice/${invoice.key}`}>
                             <Button size="sm" variant="primary" tag={Link} to={"/invoices/" + invoice.key}>Edit</Button>
                         </LinkContainer>
-                        <Button size="sm" variant="success" onClick={() => {
+                        <Button size="sm" variant="info" onClick={() => {
                             const generatePdf = functions.httpsCallable('GeneratePdf')
                             generatePdf(invoice.key).then(result => {
                                 console.info(`got response ${JSON.stringify(result)}`)
                             })
+                        }}>PDF</Button>
+                        <Button size="sm" variant="success" onClick={() => {
+
                         }}>Download</Button>
                         <Button size="sm" variant="danger" onClick={() => this.remove(invoice.key)}>Delete</Button>
                     </ButtonGroup>
@@ -79,27 +82,25 @@ export default class InvoicesList extends Component {
         });
 
         return (
-            <div>
-                <Container fluid>
-                    <div className="float-right">
-                        <LinkContainer to="/invoice/new">
-                            <Button color="success">Add Invoice</Button>
-                        </LinkContainer>
-                    </div>
-                    <h3>Invoices</h3>
-                    <Table className="mt-4">
-                        <thead>
-                            <tr>
-                                <th width="20%">Date</th>
-                                <th width="20%">Amount</th>
-                                <th width="10%">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {invoiceList}
-                        </tbody>
-                    </Table>
-                </Container>
+            <div className="container-fluid">
+                <div className="float-right">
+                    <LinkContainer to="/invoice/new">
+                        <Button color="success">Add Invoice</Button>
+                    </LinkContainer>
+                </div>
+                <h3>Invoices</h3>
+                <Table className="mt-4">
+                    <thead>
+                        <tr>
+                            <th width="20%">Date</th>
+                            <th width="20%">Amount</th>
+                            <th width="40%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {invoiceList}
+                    </tbody>
+                </Table>
             </div>
         );
     }

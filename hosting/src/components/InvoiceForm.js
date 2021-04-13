@@ -65,7 +65,7 @@ class InvoiceEdit extends Component {
             var name = e.target.name;
         }
 
-        console.log(name, value, key)
+        // console.log(name, value, key)
         var { invoice } = this.state;
 
         var index = invoice.items.findIndex(function (o) {
@@ -107,7 +107,7 @@ class InvoiceEdit extends Component {
         const { invoice } = this.state;
         const title = <h2>{invoice.id ? 'Edit Invoice' : 'Add Invoice'}</h2>;
 
-        console.log("invoice items", invoice.items);
+        // console.log("invoice items", invoice.items);
         let RenderedInvoiceItems = invoice.items.map(i => {
             return (
                 <Row key={i.id}>
