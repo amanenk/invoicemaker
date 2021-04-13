@@ -12,11 +12,7 @@ export default function Dashboard() {
             <p>
                 You can login with google to start using it.
             </p>
-
-            the location’s pathname, search, and hash properties.
-
-
-
+            <br/>
             <Link to="/my-invoices">My Invoices</Link>
 
         </Jumbotron>

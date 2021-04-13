@@ -4,7 +4,6 @@ import "./App.css"
 import Navbar from "./Navbar"
 import Landing from "./Landing"
 import MyInvoices from "./MyInvoices"
-import Login from "./Login";
 import { UserContext } from "./providers/UserProvider";
 import Spinner from 'react-bootstrap/Spinner';
 
@@ -13,7 +12,7 @@ export default function App() {
   if (!authLoaded) {
     console.log("show loading")
     return (
-      <div className="mx-auto">
+      <div className="d-flex justify-content-center loader">
         <Spinner animation="grow" variant="primary" />
       </div>
     );
@@ -27,9 +26,6 @@ export default function App() {
         <Switch>
           <Route exact path="/">
             <Landing />
-          </Route>
-          <Route path="/login">
-            <Login />
           </Route>
           <Route path="/my-invoices">
             <MyInvoices />

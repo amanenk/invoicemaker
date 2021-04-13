@@ -10,8 +10,10 @@ import { logOut } from "./services/firebase";
 import { UserContext } from "./providers/UserProvider";
 import { signInWithGoogle } from './services/firebase';
 export default () => {
-  const {user} = useContext(UserContext);
-  const brand = <Navbar.Brand href="#home">Invoice Maker</Navbar.Brand>
+  const { user } = useContext(UserContext);
+  const brand = <LinkContainer to="/">
+    <Navbar.Brand>Invoice Maker</Navbar.Brand>
+  </LinkContainer>
 
   console.log("navbar user", user);
   if (user) {
