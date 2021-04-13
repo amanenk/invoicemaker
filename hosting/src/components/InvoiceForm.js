@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { Button, Container, Form } from 'react-bootstrap';
+import { Button, Container, Form, Row, Col } from 'react-bootstrap';
 import InvoicesService from '../services/InvoicesService';
 
 import { LinkContainer } from 'react-router-bootstrap'
@@ -16,12 +16,13 @@ class InvoiceEdit extends Component {
         currency: '',
         terms: '',
         notes: '',
+        items: []
     };
 
     constructor(props) {
         super(props);
         this.state = {
-            item: this.emptyInvoice
+            invoice: this.emptyInvoice,
         };
         this.invocesService = new InvoicesService(props.userId);
     }
@@ -36,12 +37,11 @@ class InvoiceEdit extends Component {
 
     componentWillUnmount = () => {
         this.invocesService.getAll().then(data => this.onDataChange(data))
-
     }
 
-    onDataChange = (item) => {
+    onDataChange = (invoice) => {
         this.setState({
-            item: item,
+            invoice,
         });
     }
 
@@ -49,78 +49,163 @@ class InvoiceEdit extends Component {
         const target = e.target;
         const value = target.value;
         const name = target.name;
-        let item = { ...this.state.item };
-        item[name] = value;
-        this.setState({ item });
+        let invoice = { ...this.state.invoice };
+        invoice[name] = value;
+        this.setState({ invoice });
     };
+
+    handleItemChange = (e, key) => {
+        const value = e.target.value;
+        const name = e.target.name;
+
+        console.log(name, value, key)
+        var { invoice } = this.state;
+
+        var index = invoice.items.findIndex(function (o) {
+            return o.id === key;
+        })
+        console.log("index to update", index)
+        invoice.items[index][name] = value
+        console.log(invoice.items)
+
+        this.setState({ invoice });
+    };
+
+    addItem = () => {
+        var { invoice } = this.state;
+        let highestId = 0;
+        for (let item of invoice.items) {
+            if (item.id > highestId)
+                highestId = item.id;
+        }
+        invoice.items.push({ id: highestId + 1 });
+        this.setState({ invoice });
+    }
+
 
     handleSubmit = async (e) => {
         e.preventDefault();
-        const { item } = this.state;
+        const { invoice } = this.state;
         let key = this.props.match.params.key
         if (key !== 'new') {
-            await this.invocesService.update(key, item);
+            await this.invocesService.update(key, invoice);
         } else {
-            await this.invocesService.addInvoice(item);
+            await this.invocesService.addInvoice(invoice);
         }
 
         this.props.history.push('/my-invoices');
     };
 
     render = () => {
-        const { item } = this.state;
-        const title = <h2>{item.id ? 'Edit Invoice' : 'Add Invoice'}</h2>;
+        const { invoice } = this.state;
+        const title = <h2>{invoice.id ? 'Edit Invoice' : 'Add Invoice'}</h2>;
 
-        return <div>
-            <Container>
-                {title}
-                <Form onSubmit={this.handleSubmit}>
-                    <Form.Group>
-                        <Form.Label >Invoice Number</Form.Label>
-                        <Form.Control type="text" name="invoiceId" id="invoiceId" value={item.invoiceId || ''}
-                            onChange={this.handleChange} autoComplete="invoiceId" />
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label >Invoice Date</Form.Label>
-                        <Form.Control type="text" name="invoiceDate" id="invoiceDate" value={item.invoiceDate || ''}
-                            onChange={this.handleChange} autoComplete="invoiceDate" />
-                    </Form.Group>
+        console.log("invoice items", invoice.items);
+        let RenderedInvoiceItems = invoice.items.map(i => {
+            return (
+                <Row key={i.id}>
+                    <Col>
+                        <Form.Control name="title" onChange={(e) => this.handleItemChange(e, i.id)} type="text" placeholder="Title" value={i.title || ''} />
+                    </Col>
+                    <Col>
+                        <Form.Control name="quantity" onChange={(e) => this.handleItemChange(e, i.id)} type="text" placeholder="Quantity" value={i.quantity || ''} />
+                    </Col>
+                    <Col>
+                        <Form.Control name="rate" onChange={(e) => this.handleItemChange(e, i.id)} type="text" placeholder="Rate" value={i.rate || ''} />
+                    </Col>
+                    <Col>
+                        <Form.Label  >{invoice.currency}{i.rate * i.quantity}</Form.Label>
+                    </Col>
+                    <Col>
+                        <Button variant="danger" onClick={() => {
+                            var index = invoice.items.findIndex(function (o) {
+                                return o.id === i.id;
+                            });
+                            console.log("index to delete", index)
+                            if (index !== -1) invoice.items.splice(index, 1);
+                            this.setState({ invoice })
+                        }}>delete</Button>
+                    </Col>
 
-                    <Form.Group>
-                        <Form.Label >From</Form.Label>
-                        <Form.Control type="text" name="from" id="from" value={item.from || ''}
-                            onChange={this.handleChange} autoComplete="from" />
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label >To</Form.Label>
-                        <Form.Control type="text" name="to" id="to" value={item.to || ''}
-                            onChange={this.handleChange} autoComplete="to" />
-                    </Form.Group>
+                </Row>
+            )
+        });
 
-                    <Form.Group>
-                        <Form.Label>Invoice Currency</Form.Label>
-                        <Form.Control type="text" name="currency" id="currency" value={item.currency || ''}
-                            onChange={this.handleChange} autoComplete="currency" />
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label>Notes</Form.Label>
-                        <Form.Control type="text" name="notes" id="notes" value={item.notes || ''}
-                            onChange={this.handleChange} autoComplete="notes" />
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label>Terms</Form.Label>
-                        <Form.Control type="text" name="terms" id="terms" value={item.terms || ''}
-                            onChange={this.handleChange} autoComplete="terms" />
-                    </Form.Group>
-                    <Form.Group>
-                        <Button color="primary" type="submit">Save</Button>{' '}
-                        <LinkContainer to="/my-invoices">
-                            <Button color="secondary" >Cancel</Button>
-                        </LinkContainer>
-                    </Form.Group>
-                </Form>
-            </Container>
-        </div>
+
+
+        return (
+            <div>
+                <Container>
+                    {title}
+                    <Form onSubmit={this.handleSubmit}>
+                        <Form.Group>
+                            <Form.Label >Invoice Number</Form.Label>
+                            <Form.Control type="text" name="invoiceId" id="invoiceId" value={invoice.invoiceId || ''}
+                                onChange={this.handleChange} autoComplete="invoiceId" />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label >Invoice Date</Form.Label>
+                            <Form.Control type="text" name="invoiceDate" id="invoiceDate" value={invoice.invoiceDate || ''}
+                                onChange={this.handleChange} autoComplete="invoiceDate" />
+                        </Form.Group>
+
+                        <Form.Group>
+                            <Form.Label >From</Form.Label>
+                            <Form.Control type="text" name="from" id="from" value={invoice.from || ''}
+                                onChange={this.handleChange} autoComplete="from" />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label >To</Form.Label>
+                            <Form.Control type="text" name="to" id="to" value={invoice.to || ''}
+                                onChange={this.handleChange} autoComplete="to" />
+                        </Form.Group>
+
+                        <Form.Group>
+                            <Form.Label>Invoice Currency</Form.Label>
+                            <Form.Control type="text" name="currency" id="currency" value={invoice.currency || ''}
+                                onChange={this.handleChange} autoComplete="currency" />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Notes</Form.Label>
+                            <Form.Control type="text" name="notes" id="notes" value={invoice.notes || ''}
+                                onChange={this.handleChange} autoComplete="notes" />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Terms</Form.Label>
+                            <Form.Control type="text" name="terms" id="terms" value={invoice.terms || ''}
+                                onChange={this.handleChange} autoComplete="terms" />
+                        </Form.Group>
+                        <Form.Group>
+                            <Row >
+                                <Col>
+                                    <Form.Label >Title</Form.Label>
+                                </Col>
+                                <Col>
+                                    <Form.Label >Quantity</Form.Label>
+                                </Col>
+                                <Col>
+                                    <Form.Label >Rate</Form.Label>
+                                </Col>
+                                <Col>
+                                    <Form.Label >Amount</Form.Label>
+                                </Col>
+                                <Col>
+                                </Col>
+                            </Row>
+                            {RenderedInvoiceItems}
+                            <Button color="primary" onClick={this.addItem}>add item</Button>
+                        </Form.Group>
+                        <Form.Group>
+                            <Button color="primary" type="submit">Save</Button>{' '}
+                            <LinkContainer to="/my-invoices">
+                                <Button color="secondary">Cancel</Button>
+                            </LinkContainer>
+                        </Form.Group>
+                    </Form>
+                </Container>
+            </div>
+        );
+
     }
 }
 
